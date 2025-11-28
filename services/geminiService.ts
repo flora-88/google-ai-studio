@@ -140,7 +140,12 @@ export const generateNPCResponse = async (
   return response.text || "...";
 };
 
-export const generateClassQuestion = async (subject: string, user: UserProfile, lang: Language): Promise<{
+export const generateClassQuestion = async (
+  subject: string, 
+  user: UserProfile, 
+  lang: Language, 
+  previousQuestions: string[] = []
+): Promise<{
   question: string;
   options: string[];
   correctIndex: number;
@@ -148,11 +153,16 @@ export const generateClassQuestion = async (subject: string, user: UserProfile, 
 }> => {
   const aiInstance = getAi();
   const langName = LANGUAGE_NAMES[lang];
+  
   const prompt = `
-    Generate a multiple-choice question for the Hogwarts class: ${subject}.
+    Generate a NEW, UNIQUE multiple-choice question for the Hogwarts class: ${subject}.
     Student: ${user.name} (${user.house}).
     
     The question should test specific lore knowledge or spell usage relevant to ${subject}.
+    
+    The user has already answered the following questions, DO NOT repeat them:
+    ${JSON.stringify(previousQuestions)}
+    
     Provide 4 distinct options.
     Identify the correct option index (0-3).
     Provide a brief explanation/feedback for the answer.
